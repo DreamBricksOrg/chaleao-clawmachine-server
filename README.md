@@ -13,10 +13,19 @@ entidade, repositório, serviço e controller:
 - `app/user/user_controller.py`: rotas HTTP (Flask Blueprint).
 - `app/db/mongo.py`: conexão com o MongoDB, compartilhada entre domínios.
 
-## Rodando localmente
+## Rodando com Docker Compose
+
+1. Copie `.env.example` para `.env` (o valor padrão já aponta para o serviço
+   `mongo` do `docker-compose.yml`).
+2. Suba tudo: `docker compose up --build`
+3. A API fica disponível em `http://localhost:5000`.
+
+## Rodando localmente (sem Docker)
 
 1. Suba um MongoDB local (ex: `docker run -d -p 27017:27017 mongo`).
-2. Copie `.env.example` para `.env` e ajuste se necessário.
+2. Copie `.env.example` para `.env` e ajuste `MONGO_URI` para
+   `mongodb://localhost:27017` (o padrão do arquivo aponta para o serviço
+   `mongo` do Docker Compose, que não existe fora dele).
 3. Instale as dependências: `pip install -r requirements.txt`
 4. Rode a aplicação: `python main.py`
 
