@@ -178,3 +178,161 @@ document.getElementById("btnDecryptFile").addEventListener("click", async () => 
         setStatus("fileStatus", "Erro ao descriptografar arquivo: " + error.message, true);
     }
 });
+
+// --- Usuários ---
+
+let loadedUsers = [];
+
+function renderUsersTable(users) {
+    const tbody = document.getElementById("usersTableBody");
+    tbody.innerHTML = "";
+
+    for (const user of users) {
+        const row = document.createElement("tr");
+        for (const field of ["id", "name", "email", "cpf", "status"]) {
+            const cell = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "text";
+            input.readOnly = true;
+            input.value = user[field];
+            cell.appendChild(input);
+            row.appendChild(cell);
+        }
+        tbody.appendChild(row);
+    }
+}
+
+function csvEscape(value) {
+    const str = String(value ?? "");
+    if (/[",\n]/.test(str)) {
+        return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+}
+
+function usersToCsv(users) {
+    const header = ["id", "name", "email", "cpf", "status"];
+    const lines = [header.join(",")];
+    for (const user of users) {
+        lines.push(header.map((field) => csvEscape(user[field])).join(","));
+    }
+    return lines.join("\n");
+}
+
+async function loadUsers() {
+    const response = await fetch("/users");
+    if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+    }
+    loadedUsers = await response.json();
+    renderUsersTable(loadedUsers);
+    return loadedUsers;
+}
+
+document.getElementById("btnLoadUsers").addEventListener("click", async () => {
+    try {
+        const users = await loadUsers();
+        setStatus("usersStatus", users.length + " usuário(s) carregado(s).");
+    } catch (error) {
+        setStatus("usersStatus", "Erro ao carregar usuários: " + error.message, true);
+    }
+});
+
+document.getElementById("btnDownloadEncryptedCsv").addEventListener("click", () => {
+    if (loadedUsers.length === 0) {
+        setStatus("usersStatus", "Carregue os usuários antes de baixar o CSV.", true);
+        return;
+    }
+    downloadBlob("usuarios_criptografados.csv", [usersToCsv(loadedUsers)], "text/csv");
+    setStatus("usersStatus", "CSV criptografado baixado.");
+});
+
+document.getElementById("btnDownloadDecryptedCsv").addEventListener("click", async () => {
+    if (loadedUsers.length === 0) {
+        setStatus("usersStatus", "Carregue os usuários antes de baixar o CSV.", true);
+        return;
+    }
+
+    const privateKeyPem = document.getElementById("privateKeyPem").value;
+    if (!privateKeyPem) {
+        setStatus("usersStatus", "Informe a chave privada para descriptografar os usuários.", true);
+        return;
+    }
+
+    try {
+        const decryptedUsers = [];
+        for (const user of loadedUsers) {
+            decryptedUsers.push({
+                id: user.id,
+                name: await dbDecryptString(user.name, privateKeyPem),
+                email: await dbDecryptString(user.email, privateKeyPem),
+                cpf: await dbDecryptString(user.cpf, privateKeyPem),
+                status: user.status,
+            });
+        }
+        downloadBlob("usuarios_descriptografados.csv", [usersToCsv(decryptedUsers)], "text/csv");
+        setStatus("usersStatus", "CSV descriptografado baixado.");
+    } catch (error) {
+        setStatus("usersStatus", "Erro ao descriptografar usuários: " + error.message, true);
+    }
+});
+
+// --- Novo usuário (modal) ---
+
+function openCreateUserModal() {
+    document.getElementById("newUserId").value = crypto.randomUUID();
+    document.getElementById("newUserName").value = "";
+    document.getElementById("newUserEmail").value = "";
+    document.getElementById("newUserCpf").value = "";
+    document.getElementById("newUserStatus").value = "active";
+    setStatus("createUserStatus", "");
+    document.getElementById("createUserModalOverlay").classList.add("open");
+}
+
+function closeCreateUserModal() {
+    document.getElementById("createUserModalOverlay").classList.remove("open");
+}
+
+document.getElementById("btnOpenCreateUserModal").addEventListener("click", openCreateUserModal);
+document.getElementById("btnCancelCreateUser").addEventListener("click", closeCreateUserModal);
+
+document.getElementById("createUserForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const publicKeyPem = document.getElementById("publicKeyPem").value;
+    if (!publicKeyPem) {
+        setStatus("createUserStatus", "Informe a chave pública (seção 1) para criptografar o novo usuário.", true);
+        return;
+    }
+
+    const name = document.getElementById("newUserName").value;
+    const email = document.getElementById("newUserEmail").value;
+    const cpf = document.getElementById("newUserCpf").value;
+    const status = document.getElementById("newUserStatus").value;
+
+    try {
+        const payload = {
+            name: await dbEncryptString(name, publicKeyPem),
+            email: await dbEncryptString(email, publicKeyPem),
+            cpf: await dbEncryptString(cpf, publicKeyPem),
+            status,
+        };
+
+        const response = await fetch("/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json().catch(() => ({}));
+            throw new Error(errorBody.error || "HTTP " + response.status);
+        }
+
+        closeCreateUserModal();
+        await loadUsers();
+        setStatus("usersStatus", "Usuário criado com sucesso.");
+    } catch (error) {
+        setStatus("createUserStatus", "Erro ao criar usuário: " + error.message, true);
+    }
+});

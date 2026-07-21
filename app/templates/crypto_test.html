@@ -154,6 +154,70 @@
         margin-top: 0.75rem;
         border: 1px solid rgba(255, 255, 255, 0.4);
       }
+      #usersTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 0.75rem;
+        table-layout: fixed;
+      }
+      #usersTable th,
+      #usersTable td {
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 0.4rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      #usersTable td input {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 0.75rem;
+        background-color: #f5a623;
+        color: #3a2409;
+        border: none;
+        border-radius: 4px;
+        padding: 0.3rem;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal-box {
+        background-color: #b45a1c;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 10px;
+        padding: 1.5rem;
+        width: 90%;
+        max-width: 480px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-box h2 {
+        margin-top: 0;
+      }
+      select {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: "FS Albert Pro", sans-serif;
+        font-size: 0.9rem;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        background-color: #f5a623;
+        color: #3a2409;
+      }
+      input[readonly] {
+        opacity: 0.85;
+        cursor: not-allowed;
+      }
     </style>
   </head>
   <body>
@@ -213,6 +277,65 @@
       <p id="fileStatus" class="status"></p>
       <img id="decryptedPreview" alt="Prévia do arquivo descriptografado (se for imagem)" />
     </section>
+
+    <section>
+      <h2>4. Usuários</h2>
+      <p>Carrega os usuários da API (<code>GET /users</code>) e permite baixar os dados em CSV, criptografados (como estão salvos) ou descriptografados (usando a chave privada acima).</p>
+
+      <button id="btnLoadUsers" type="button">Carregar usuários</button>
+      <button id="btnDownloadEncryptedCsv" type="button">Baixar CSV criptografado</button>
+      <button id="btnDownloadDecryptedCsv" type="button">Baixar CSV descriptografado</button>
+      <button id="btnOpenCreateUserModal" type="button">Novo usuário</button>
+
+      <p id="usersStatus" class="status"></p>
+
+      <form id="usersForm">
+        <table id="usersTable">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>name</th>
+              <th>email</th>
+              <th>cpf</th>
+              <th>status</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody"></tbody>
+        </table>
+      </form>
+    </section>
+
+    <div id="createUserModalOverlay" class="modal-overlay">
+      <div class="modal-box">
+        <h2>Novo usuário</h2>
+        <form id="createUserForm">
+          <label for="newUserId">id</label>
+          <input id="newUserId" type="text" readonly />
+
+          <label for="newUserName">name</label>
+          <input id="newUserName" type="text" placeholder="ex: Ana Silva" required />
+
+          <label for="newUserEmail">email</label>
+          <input id="newUserEmail" type="text" placeholder="ex: ana@example.com" required />
+
+          <label for="newUserCpf">cpf</label>
+          <input id="newUserCpf" type="text" placeholder="ex: 11122233344" required />
+
+          <label for="newUserStatus">status</label>
+          <select id="newUserStatus">
+            <option value="active">active</option>
+            <option value="form">form</option>
+            <option value="play">play</option>
+            <option value="complete">complete</option>
+          </select>
+
+          <button id="btnSubmitCreateUser" type="submit">Criar</button>
+          <button id="btnCancelCreateUser" type="button">Cancelar</button>
+
+          <p id="createUserStatus" class="status"></p>
+        </form>
+      </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/crypt/util.js') }}"></script>
     <script src="{{ url_for('static', filename='js/crypt/aes_encryption.js') }}"></script>
