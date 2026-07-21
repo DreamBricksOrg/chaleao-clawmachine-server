@@ -16,7 +16,11 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    mongo_client = get_mongo_client(app.config["MONGO_URI"])
+    mongo_client = get_mongo_client(
+        app.config["MONGO_URI"],
+        username=app.config["MONGO_USER"],
+        password=app.config["MONGO_PASSWORD"],
+    )
     database = get_database(mongo_client, app.config["MONGO_DB_NAME"])
     user_repository = UserRepository(database)
     user_service = UserService(user_repository)

@@ -6,13 +6,18 @@ services:
     environment:
       MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017}
       MONGO_DB_NAME: ${MONGO_DB_NAME:-clawmachine}
+      MONGO_USER: ${MONGO_USER:-root}
+      MONGO_PASSWORD: ${MONGO_PASSWORD:-changeme}
     depends_on:
       - mongo
 
   mongo:
     image: mongo:7
     ports:
-      - "27018:27017"
+      - "27021:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-changeme}
     volumes:
       - mongo_data:/data/db
 

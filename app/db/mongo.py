@@ -1,7 +1,9 @@
 from pymongo import MongoClient
 
 
-def get_mongo_client(uri):
+def get_mongo_client(uri, username=None, password=None):
+    if username and password:
+        return MongoClient(uri, username=username, password=password)
     return MongoClient(uri)
 
 
