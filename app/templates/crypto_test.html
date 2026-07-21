@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <title>Teste de Criptografia RSA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <style>
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FS Albert Pro.otf') }}");
+        font-weight: 400;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FS Albert Pro-Italic.otf') }}");
+        font-weight: 400;
+        font-style: italic;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FS Albert Pro-Light.otf') }}");
+        font-weight: 300;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FS Albert Pro-LightItalic.otf') }}");
+        font-weight: 300;
+        font-style: italic;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FS Albert Pro-Bold.otf') }}");
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FS Albert Pro-BoldItalic.otf') }}");
+        font-weight: 700;
+        font-style: italic;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FS Albert Pro-ExtraBold.otf') }}");
+        font-weight: 800;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FSAlbertPro-Thin.ttf') }}");
+        font-weight: 100;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "FS Albert Pro";
+        src: url("{{ url_for('static', filename='fonts/FSAlbertPro-ThinItalic.ttf') }}");
+        font-weight: 100;
+        font-style: italic;
+      }
+      @font-face {
+        font-family: "Leao Type";
+        src: url("{{ url_for('static', filename='fonts/Leao-Type-Reg.otf') }}");
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      body {
+        font-family: "FS Albert Pro", sans-serif;
+        color: #ffffff;
+        background-image: url("{{ url_for('static', filename='images/tela_crypt.png') }}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+        padding: 2rem;
+        box-sizing: border-box;
+      }
+      h1, h2 {
+        font-family: "Leao Type", "FS Albert Pro", sans-serif;
+        color: #ffffff;
+      }
+      section {
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        background-color: rgba(0, 0, 0, 0.35);
+        color: #ffffff;
+      }
+      textarea,
+      input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 0.85rem;
+        border: 2px dashed transparent;
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        background-color: #f5a623;
+        color: #3a2409;
+        outline: none;
+      }
+      textarea::placeholder,
+      input[type="text"]::placeholder {
+        color: #7a4e14;
+      }
+      textarea.drag-over {
+        border-color: #2f5233;
+        background-color: #f8bc55;
+      }
+      label {
+        display: block;
+        font-weight: bold;
+        margin-top: 0.75rem;
+        color: #ffffff;
+      }
+      button {
+        margin-top: 0.75rem;
+        margin-right: 0.5rem;
+        font-family: "FS Albert Pro", sans-serif;
+        font-weight: bold;
+        font-size: 0.95rem;
+        color: #ffffff;
+        background-color: #2f5233;
+        border: none;
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        padding: 0.6rem 1.4rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease-in-out;
+      }
+      button:hover {
+        background-color: #3d6b43;
+      }
+      button:active {
+        background-color: #24401f;
+      }
+      input[type="file"] {
+        color: #ffffff;
+        margin-top: 0.25rem;
+      }
+      .status {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        min-height: 1.2em;
+      }
+      #decryptedPreview {
+        display: none;
+        max-width: 300px;
+        max-height: 300px;
+        margin-top: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Teste de Criptografia RSA</h1>
+    <p>
+      Página de testes: gera par de chaves RSA, e permite criptografar/descriptografar
+      texto e arquivos (imagens ou qualquer binário) usando as chaves carregadas.
+      Arquivos maiores que um bloco RSA usam automaticamente um esquema híbrido RSA+AES.
+    </p>
+
+    <section>
+      <h2>1. Chaves</h2>
+      <button id="btnGenerateKeys" type="button">Gerar novo par de chaves</button>
+
+      <label for="publicKeyPem">Chave pública (PEM)</label>
+      <textarea id="publicKeyPem" rows="6" placeholder="-----BEGIN PUBLIC KEY-----&#10;(ou arraste o arquivo .pem aqui)"></textarea>
+      <button id="btnDownloadPublicKey" type="button">Baixar chave pública</button>
+      <label for="publicKeyFile">Carregar chave pública de um arquivo</label>
+      <input id="publicKeyFile" type="file" accept=".pem,.txt" />
+
+      <label for="privateKeyPem">Chave privada (PEM)</label>
+      <textarea id="privateKeyPem" rows="10" placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;(ou arraste o arquivo .pem aqui)"></textarea>
+      <button id="btnDownloadPrivateKey" type="button">Baixar chave privada</button>
+      <label for="privateKeyFile">Carregar chave privada de um arquivo</label>
+      <input id="privateKeyFile" type="file" accept=".pem,.txt" />
+
+      <p id="keysStatus" class="status"></p>
+    </section>
+
+    <section>
+      <h2>2. Texto</h2>
+      <label for="plainText">Texto puro</label>
+      <textarea id="plainText" rows="4"></textarea>
+
+      <label for="cipherTextB64">Texto criptografado (base64)</label>
+      <textarea id="cipherTextB64" rows="4"></textarea>
+
+      <button id="btnEncryptText" type="button">Criptografar texto →</button>
+      <button id="btnDecryptText" type="button">← Descriptografar texto</button>
+
+      <p id="textStatus" class="status"></p>
+    </section>
+
+    <section>
+      <h2>3. Arquivo / imagem</h2>
+
+      <label for="fileToEncrypt">Arquivo para criptografar (imagem ou qualquer tipo)</label>
+      <input id="fileToEncrypt" type="file" />
+      <button id="btnEncryptFile" type="button">Criptografar arquivo e baixar (.enc)</button>
+
+      <label for="fileToDecrypt">Arquivo .enc para descriptografar</label>
+      <input id="fileToDecrypt" type="file" />
+      <label for="decryptedFileName">Nome do arquivo de saída (com extensão)</label>
+      <input id="decryptedFileName" type="text" placeholder="ex: foto.png" />
+      <button id="btnDecryptFile" type="button">Descriptografar arquivo e baixar</button>
+
+      <p id="fileStatus" class="status"></p>
+      <img id="decryptedPreview" alt="Prévia do arquivo descriptografado (se for imagem)" />
+    </section>
+
+    <script src="{{ url_for('static', filename='js/crypt/util.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/crypt/aes_encryption.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/crypt/rsa_encryption.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/crypt/db_encryption.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/crypto_test_page.js') }}"></script>
+  </body>
+</html>
