@@ -1,0 +1,5 @@
+flask
+pymongo
+pydantic
+email-validator
+python-dotenv
