@@ -173,6 +173,38 @@ OPENAPI_SPEC = {
                 },
             }
         },
+        "/api/play/{user_id}": {
+            "get": {
+                "tags": ["qr"],
+                "summary": "Consulta o status de um usuário pelo id (404 se não encontrado)",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "string"},
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Status do usuário",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/StatusResponse"}
+                            }
+                        },
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                            }
+                        },
+                    },
+                },
+            }
+        },
     },
     "components": {
         "schemas": {
