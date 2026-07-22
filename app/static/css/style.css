@@ -1,3 +1,73 @@
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FS Albert Pro.otf");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FS Albert Pro-Italic.otf");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FS Albert Pro-Light.otf");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FS Albert Pro-LightItalic.otf");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FS Albert Pro-Bold.otf");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FS Albert Pro-BoldItalic.otf");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FS Albert Pro-ExtraBold.otf");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FSAlbertPro-Thin.ttf");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FS Albert Pro";
+  src: url("/static/fonts/FSAlbertPro-ThinItalic.ttf");
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Leao Type";
+  src: url("/static/fonts/Leao-Type-Reg.otf");
+  font-weight: 400;
+  font-style: normal;
+}
+
 body {
   font-family: sans-serif;
   margin: 2rem;

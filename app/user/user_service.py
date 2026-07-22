@@ -21,12 +21,12 @@ class UserService:
     def list_users(self):
         return self.repository.list_all()
 
-    def update_user(self, user_id, name=None, email=None, cpf=None, status=None):
+    def update_user(self, user_id, name=None, email=None, cpf=None, status=None, email_hash=None):
         user = self.repository.get_by_id(user_id)
         if user is None:
             return None
 
-        user.update(name=name, email=email, cpf=cpf, status=status)
+        user.update(name=name, email=email, cpf=cpf, status=status, email_hash=email_hash)
         self.repository.update(user)
         return user
 

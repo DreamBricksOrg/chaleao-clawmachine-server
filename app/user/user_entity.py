@@ -53,7 +53,7 @@ class User:
     def create_blank(cls, status=UserStatus.ACTIVE, id=None):
         return cls(id=id, status=status)
 
-    def update(self, name=None, email=None, cpf=None, status=None):
+    def update(self, name=None, email=None, cpf=None, status=None, email_hash=None):
         if name is not None:
             if not name:
                 raise ValueError("name is required")
@@ -62,7 +62,7 @@ class User:
             if not email:
                 raise ValueError("email is required")
             self.email = email
-            self.email_hash = self.hash_email(email)
+            self.email_hash = email_hash if email_hash is not None else self.hash_email(email)
         if cpf is not None:
             if not cpf:
                 raise ValueError("cpf is required")

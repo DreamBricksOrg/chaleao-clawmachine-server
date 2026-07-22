@@ -45,6 +45,7 @@ def create_user_blueprint(user_service):
                 email=data.get("email"),
                 cpf=data.get("cpf"),
                 status=data.get("status"),
+                email_hash=data.get("email_hash"),
             )
         except ValueError as error:
             return jsonify({"error": str(error)}), 400

@@ -291,6 +291,7 @@ OPENAPI_SPEC = {
                 "properties": {
                     "name": {"type": "string"},
                     "email": {"type": "string"},
+                    "email_hash": {"type": "string"},
                     "cpf": {"type": "string"},
                     "status": {"$ref": "#/components/schemas/UserStatus"},
                 },
