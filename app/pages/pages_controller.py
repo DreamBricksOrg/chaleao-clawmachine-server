@@ -14,6 +14,14 @@ def create_pages_blueprint(user_service):
     def crypto_test():
         return render_template("crypto_test.html")
 
+    @pages_bp.get("/continue")
+    def continue_page():
+        return render_template("continue.html")
+
+    @pages_bp.get("/play_error")
+    def play_error_page():
+        return render_template("play_error.html")
+
     @pages_bp.get("/pages/form/<user_id>")
     def form_page(user_id):
         if user_service.get_user(user_id) is None:
