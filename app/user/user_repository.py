@@ -30,6 +30,7 @@ class UserRepository:
             "email": user.email,
             "cpf": user.cpf,
             "status": user.status.value,
+            "created_at": user.created_at,
         }
         if include_id:
             document["_id"] = user.id
@@ -43,4 +44,5 @@ class UserRepository:
             email=document["email"],
             cpf=document["cpf"],
             status=UserStatus(document["status"]),
+            created_at=document.get("created_at"),
         )

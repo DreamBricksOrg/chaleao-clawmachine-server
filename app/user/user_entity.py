@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 from enum import Enum
 
 
@@ -10,19 +11,27 @@ class UserStatus(str, Enum):
 
 
 class User:
-    def __init__(self, name, email, cpf, status=UserStatus.ACTIVE, id=None):
+    def __init__(self, status=UserStatus.ACTIVE, id=None, name=None, email=None, cpf=None, created_at=None):
+        self.id = id or str(uuid.uuid4())
+        self.name = name
+        self.email = email
+        self.cpf = cpf
+        self.status = UserStatus(status)
+        self.created_at = created_at or datetime.now(timezone.utc)
+
+    @classmethod
+    def create(cls, name, email, cpf, status=UserStatus.ACTIVE, id=None):
         if not name:
             raise ValueError("name is required")
         if not email:
             raise ValueError("email is required")
         if not cpf:
             raise ValueError("cpf is required")
+        return cls(id=id, name=name, email=email, cpf=cpf, status=status)
 
-        self.id = id or str(uuid.uuid4())
-        self.name = name
-        self.email = email
-        self.cpf = cpf
-        self.status = UserStatus(status)
+    @classmethod
+    def create_blank(cls, status=UserStatus.ACTIVE, id=None):
+        return cls(id=id, status=status)
 
     def update(self, name=None, email=None, cpf=None, status=None):
         if name is not None:
@@ -47,4 +56,5 @@ class User:
             "email": self.email,
             "cpf": self.cpf,
             "status": self.status.value,
+            "created_at": self.created_at.isoformat(),
         }

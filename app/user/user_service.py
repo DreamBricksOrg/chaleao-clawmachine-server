@@ -6,7 +6,12 @@ class UserService:
         self.repository = repository
 
     def create_user(self, name, email, cpf, status=UserStatus.ACTIVE):
-        user = User(name=name, email=email, cpf=cpf, status=status)
+        user = User.create(name=name, email=email, cpf=cpf, status=status)
+        self.repository.add(user)
+        return user
+
+    def create_blank_user(self, user_id, status=UserStatus.ACTIVE):
+        user = User.create_blank(id=user_id, status=status)
         self.repository.add(user)
         return user
 
