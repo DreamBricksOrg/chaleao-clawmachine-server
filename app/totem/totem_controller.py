@@ -34,17 +34,15 @@ def create_totem_api_blueprint(user_service):
             return jsonify({"error": "User not found"}), 404
         return jsonify(user.to_dict()), 200
 
-    return totem_bp
-
-
-def create_totem_status_blueprint(user_service):
-    totem_status_bp = Blueprint("totem_status", __name__)
-
-    @totem_status_bp.get("/start/<user_id>")
+    @totem_bp.get("/start/<user_id>")
     def start(user_id):
         user = user_service.get_user(user_id)
         if user is None:
             return jsonify({"status": "inactive"}), 200
         return jsonify({"status": user.status.value}), 200
+        
+    return totem_bp
 
-    return totem_status_bp
+    
+
+    

@@ -9,7 +9,7 @@ from app.db.mongo import get_database, get_mongo_client
 from app.decrypt.decrypt_controller import create_decrypt_blueprint
 from app.docs.docs_controller import docs_bp, swagger_ui_bp
 from app.pages.pages_controller import create_pages_blueprint
-from app.totem.totem_controller import create_totem_api_blueprint, create_totem_status_blueprint
+from app.totem.totem_controller import create_totem_api_blueprint
 from app.user.user_controller import create_user_blueprint
 from app.user.user_repository import UserRepository
 from app.user.user_service import UserService
@@ -31,12 +31,10 @@ def create_app(config_class=Config):
     users_bp = create_user_blueprint(user_service)
     pages_bp = create_pages_blueprint(user_service)
     totem_bp = create_totem_api_blueprint(user_service)
-    totem_status_bp = create_totem_status_blueprint(user_service)
     decrypt_bp = create_decrypt_blueprint(app.config)
     app.register_blueprint(users_bp)
     app.register_blueprint(pages_bp)
     app.register_blueprint(totem_bp)
-    app.register_blueprint(totem_status_bp)
     app.register_blueprint(docs_bp)
     app.register_blueprint(swagger_ui_bp)
     app.register_blueprint(decrypt_bp)

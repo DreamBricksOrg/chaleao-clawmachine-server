@@ -149,7 +149,7 @@ OPENAPI_SPEC = {
                 },
             }
         },
-        "/start/{user_id}": {
+        "/api/start/{user_id}": {
             "get": {
                 "tags": ["qr"],
                 "summary": "Consulta o status de um usuário pelo id",
@@ -258,6 +258,7 @@ OPENAPI_SPEC = {
                     "id": {"type": "string", "format": "uuid"},
                     "name": {"type": "string", "nullable": True},
                     "email": {"type": "string", "nullable": True},
+                    "email_hash": {"type": "string", "nullable": True},
                     "cpf": {"type": "string", "nullable": True},
                     "status": {"$ref": "#/components/schemas/UserStatus"},
                     "created_at": {"type": "string", "format": "date-time"},

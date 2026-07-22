@@ -1,3 +1,4 @@
+import hashlib
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
@@ -21,6 +22,7 @@ class User:
         cpf=None,
         created_at=None,
         last_plays=None,
+        email_hash=None,
     ):
         self.id = id or str(uuid.uuid4())
         self.name = name
@@ -29,6 +31,13 @@ class User:
         self.status = UserStatus(status)
         self.created_at = created_at or datetime.now(timezone.utc)
         self.last_plays = list(last_plays) if last_plays else []
+        self.email_hash = email_hash if email_hash is not None else self.hash_email(email)
+
+    @staticmethod
+    def hash_email(email):
+        if not email:
+            return None
+        return hashlib.sha256(email.encode("utf-8")).hexdigest()
 
     @classmethod
     def create(cls, name, email, cpf, status=UserStatus.ACTIVE, id=None):
@@ -53,6 +62,7 @@ class User:
             if not email:
                 raise ValueError("email is required")
             self.email = email
+            self.email_hash = self.hash_email(email)
         if cpf is not None:
             if not cpf:
                 raise ValueError("cpf is required")
@@ -74,6 +84,7 @@ class User:
             "id": self.id,
             "name": self.name,
             "email": self.email,
+            "email_hash": self.email_hash,
             "cpf": self.cpf,
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),

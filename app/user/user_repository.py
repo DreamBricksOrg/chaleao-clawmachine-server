@@ -28,6 +28,7 @@ class UserRepository:
         document = {
             "name": user.name,
             "email": user.email,
+            "email_hash": user.email_hash,
             "cpf": user.cpf,
             "status": user.status.value,
             "created_at": user.created_at,
@@ -47,4 +48,5 @@ class UserRepository:
             status=UserStatus(document["status"]),
             created_at=document.get("created_at"),
             last_plays=document.get("last_plays"),
+            email_hash=document.get("email_hash"),
         )
