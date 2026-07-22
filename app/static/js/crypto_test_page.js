@@ -260,13 +260,16 @@ document.getElementById("btnDownloadDecryptedCsv").addEventListener("click", asy
     }
 
     try {
+        const decryptField = (value) =>
+            value ? dbDecryptString(value, privateKeyPem) : Promise.resolve("");
+
         const decryptedUsers = [];
         for (const user of loadedUsers) {
             decryptedUsers.push({
                 id: user.id,
-                name: await dbDecryptString(user.name, privateKeyPem),
-                email: await dbDecryptString(user.email, privateKeyPem),
-                cpf: await dbDecryptString(user.cpf, privateKeyPem),
+                name: await decryptField(user.name),
+                email: await decryptField(user.email),
+                cpf: await decryptField(user.cpf),
                 status: user.status,
             });
         }

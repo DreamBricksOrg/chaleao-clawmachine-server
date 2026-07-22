@@ -6,3 +6,6 @@ class Config:
     MONGO_DB_NAME = os.environ.get("MONGO_DB_NAME", "clawmachine")
     MONGO_USER = os.environ.get("MONGO_USER", "")
     MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD", "")
+    DUSER = os.environ.get("DUSER", "")
+    DPASSWORD = os.environ.get("DPASSWORD", "")
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
