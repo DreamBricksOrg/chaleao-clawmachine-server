@@ -29,3 +29,12 @@ class UserService:
         user.update(name=name, email=email, cpf=cpf, status=status)
         self.repository.update(user)
         return user
+
+    def register_match_result(self, user_id, result):
+        user = self.repository.get_by_id(user_id)
+        if user is None:
+            return None
+
+        user.register_match_result(result)
+        self.repository.update(user)
+        return user

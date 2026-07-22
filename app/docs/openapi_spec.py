@@ -205,12 +205,52 @@ OPENAPI_SPEC = {
                 },
             }
         },
+        "/api/matchresult": {
+            "post": {
+                "tags": ["totem"],
+                "summary": "Registra o resultado de uma partida para um usuário",
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {
+                            "schema": {"$ref": "#/components/schemas/MatchResultRequest"}
+                        }
+                    },
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuário atualizado com o resultado da partida",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/User"}
+                            }
+                        },
+                    },
+                    "400": {
+                        "description": "Resultado inválido (deve ser 'win' ou 'lose')",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                            }
+                        },
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                            }
+                        },
+                    },
+                },
+            }
+        },
     },
     "components": {
         "schemas": {
             "UserStatus": {
                 "type": "string",
-                "enum": ["active", "form", "play", "complete"],
+                "enum": ["active", "form", "play", "complete", "play_again"],
             },
             "User": {
                 "type": "object",
@@ -221,6 +261,18 @@ OPENAPI_SPEC = {
                     "cpf": {"type": "string", "nullable": True},
                     "status": {"$ref": "#/components/schemas/UserStatus"},
                     "created_at": {"type": "string", "format": "date-time"},
+                    "last_plays": {
+                        "type": "array",
+                        "items": {"type": "string", "format": "date-time"},
+                    },
+                },
+            },
+            "MatchResultRequest": {
+                "type": "object",
+                "required": ["id", "result"],
+                "properties": {
+                    "id": {"type": "string"},
+                    "result": {"type": "string", "enum": ["win", "lose"]},
                 },
             },
             "CreateUserRequest": {

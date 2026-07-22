@@ -31,6 +31,7 @@ class UserRepository:
             "cpf": user.cpf,
             "status": user.status.value,
             "created_at": user.created_at,
+            "last_plays": user.last_plays,
         }
         if include_id:
             document["_id"] = user.id
@@ -45,4 +46,5 @@ class UserRepository:
             cpf=document["cpf"],
             status=UserStatus(document["status"]),
             created_at=document.get("created_at"),
+            last_plays=document.get("last_plays"),
         )

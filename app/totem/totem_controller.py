@@ -19,6 +19,21 @@ def create_totem_api_blueprint(user_service):
             return jsonify({"error": "User not found"}), 404
         return jsonify({"status": user.status.value}), 200
 
+    @totem_bp.post("/matchresult")
+    def match_result():
+        data = request.get_json(silent=True) or {}
+        user_id = data.get("id")
+        result = data.get("result")
+
+        try:
+            user = user_service.register_match_result(user_id, result)
+        except ValueError as error:
+            return jsonify({"error": str(error)}), 400
+
+        if user is None:
+            return jsonify({"error": "User not found"}), 404
+        return jsonify(user.to_dict()), 200
+
     return totem_bp
 
 
