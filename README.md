@@ -46,6 +46,13 @@ curl -X POST http://localhost:5000/users \
   -d '{"name": "Ana", "email": "ana@example.com", "cpf": "11122233344"}'
 ```
 
+## Documentação da API (Swagger)
+
+Com a aplicação rodando, a documentação interativa (Swagger UI) fica em
+`http://localhost:5000/docs` (ou `:5002` se estiver usando a porta do
+`docker-compose.yml`). O spec OpenAPI cru fica em `/openapi.json`
+(`app/docs/openapi_spec.py`).
+
 ## Próximos passos
 
 - Adicionar testes automatizados (unitários para domínio/use cases,
