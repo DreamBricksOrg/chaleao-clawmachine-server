@@ -47,6 +47,7 @@
       h1, h2 {
         font-family: "Leao Type", "FS Albert Pro", sans-serif;
         color: #ffffff;
+        text-transform: lowercase;
       }
       section {
         border: 1px solid rgba(255, 255, 255, 0.4);
@@ -142,7 +143,7 @@
   </head>
   <body>
     <div class="page">
-      <h1>Descriptografar Dados</h1>
+      <h1>descriptografar dados</h1>
 
       {% if not authenticated %}
         <section>
@@ -151,26 +152,26 @@
             <p class="error-message">{{ error }}</p>
           {% endif %}
           <form method="post">
-            <label for="username">Usuário</label>
+            <label for="username">usuário</label>
             <input id="username" name="username" type="text" required />
 
-            <label for="password">Senha</label>
+            <label for="password">senha</label>
             <input id="password" name="password" type="password" required />
 
-            <button type="submit">Entrar</button>
+            <button type="submit">entrar</button>
           </form>
         </section>
       {% else %}
         <section>
-          <button id="btnMenuKeys" class="menu-button" type="button">Gerar chaves</button>
-          <button id="btnMenuDecrypt" class="menu-button" type="button">Descriptografar dados</button>
-          <a href="{{ url_for('decrypt.descrypt_logout') }}"><button type="button">Sair</button></a>
+          <button id="btnMenuKeys" class="menu-button" type="button">gerar chaves</button>
+          <button id="btnMenuDecrypt" class="menu-button" type="button">descriptografar dados</button>
+          <a href="{{ url_for('decrypt.decrypt_logout') }}"><button type="button">sair</button></a>
         </section>
 
         <section id="tabKeys" class="tab">
-          <h2>Gerar chaves</h2>
+          <h2>gerar chaves</h2>
           <p>
-            Gera um novo par de chaves RSA. A chave privada
+            gera um novo par de chaves RSA. A chave privada
             (<strong>private_key.pem</strong>) deve ser guardada com o time
             responsável pela ação do projeto. A chave pública
             (<strong>public_key.pem</strong>) deve ser enviada ao
@@ -200,6 +201,6 @@
     <script src="{{ url_for('static', filename='js/crypt/aes_encryption.js') }}"></script>
     <script src="{{ url_for('static', filename='js/crypt/rsa_encryption.js') }}"></script>
     <script src="{{ url_for('static', filename='js/crypt/db_encryption.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/descrypt_page.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/decrypt_page.js') }}"></script>
   </body>
 </html>

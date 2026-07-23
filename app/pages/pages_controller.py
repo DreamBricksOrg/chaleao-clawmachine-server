@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, redirect, render_template, request, url_fo
 from app.user.user_entity import UserStatus
 
 COOKIE_NAME = "user_id"
-COOKIE_MAX_AGE = 60 * 60 * 24 * 365  # 1 ano
+COOKIE_MAX_AGE = 60 * 60 * 12  # 12 horas
 
 
 def create_pages_blueprint(user_service):
