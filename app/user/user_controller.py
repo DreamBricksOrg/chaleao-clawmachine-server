@@ -14,7 +14,7 @@ def create_user_blueprint(user_service):
             user = user_service.create_user(
                 name=data.get("name"),
                 email=data.get("email"),
-                cpf=data.get("cpf"),
+                phone=data.get("phone"),
                 status=data.get("status", UserStatus.ACTIVE),
             )
         except ValueError as error:
@@ -43,7 +43,7 @@ def create_user_blueprint(user_service):
                 user_id,
                 name=data.get("name"),
                 email=data.get("email"),
-                cpf=data.get("cpf"),
+                phone=data.get("phone"),
                 status=data.get("status"),
                 email_hash=data.get("email_hash"),
             )

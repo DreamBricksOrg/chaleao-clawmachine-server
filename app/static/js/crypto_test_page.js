@@ -189,7 +189,7 @@ function renderUsersTable(users) {
 
     for (const user of users) {
         const row = document.createElement("tr");
-        for (const field of ["id", "name", "email", "cpf", "status"]) {
+        for (const field of ["id", "name", "email", "phone", "status"]) {
             const cell = document.createElement("td");
             const input = document.createElement("input");
             input.type = "text";
@@ -211,7 +211,7 @@ function csvEscape(value) {
 }
 
 function usersToCsv(users) {
-    const header = ["id", "name", "email", "cpf", "status"];
+    const header = ["id", "name", "email", "phone", "status"];
     const lines = [header.join(",")];
     for (const user of users) {
         lines.push(header.map((field) => csvEscape(user[field])).join(","));
@@ -269,7 +269,7 @@ document.getElementById("btnDownloadDecryptedCsv").addEventListener("click", asy
                 id: user.id,
                 name: await decryptField(user.name),
                 email: await decryptField(user.email),
-                cpf: await decryptField(user.cpf),
+                phone: await decryptField(user.phone),
                 status: user.status,
             });
         }
@@ -286,7 +286,7 @@ function openCreateUserModal() {
     document.getElementById("newUserId").value = crypto.randomUUID();
     document.getElementById("newUserName").value = "";
     document.getElementById("newUserEmail").value = "";
-    document.getElementById("newUserCpf").value = "";
+    document.getElementById("newUserPhone").value = "";
     document.getElementById("newUserStatus").value = "active";
     setStatus("createUserStatus", "");
     document.getElementById("createUserModalOverlay").classList.add("open");
@@ -310,14 +310,14 @@ document.getElementById("createUserForm").addEventListener("submit", async (even
 
     const name = document.getElementById("newUserName").value;
     const email = document.getElementById("newUserEmail").value;
-    const cpf = document.getElementById("newUserCpf").value;
+    const phone = document.getElementById("newUserPhone").value;
     const status = document.getElementById("newUserStatus").value;
 
     try {
         const payload = {
             name: await dbEncryptString(name, publicKeyPem),
             email: await dbEncryptString(email, publicKeyPem),
-            cpf: await dbEncryptString(cpf, publicKeyPem),
+            phone: await dbEncryptString(phone, publicKeyPem),
             status,
         };
 

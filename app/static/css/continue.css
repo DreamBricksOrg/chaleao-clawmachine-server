@@ -1,4 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+
 body {
   font-family: sans-serif;
-  margin: 2rem;
+  background-image: linear-gradient(to bottom right, #ffcccc, #ffe6e6);
+  color: #ffffff;
+  background-image: url("/static/images/celular/tela3/fundo_3_notext.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 4rem;
+
 }

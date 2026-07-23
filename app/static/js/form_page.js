@@ -4,16 +4,16 @@ function maskName(value) {
     return value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s]/g, "");
 }
 
-function maskCPF(value) {
+function maskPhone(value) {
     const digits = value.replace(/\D/g, "").slice(0, 11);
-    if (digits.length > 9) {
-        return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
+    if (digits.length > 10) {
+        return digits.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
     }
     if (digits.length > 6) {
-        return digits.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+        return digits.replace(/(\d{2})(\d{4})(\d{1,4})/, "($1) $2-$3");
     }
-    if (digits.length > 3) {
-        return digits.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+    if (digits.length > 2) {
+        return digits.replace(/(\d{2})(\d{1,5})/, "($1) $2");
     }
     return digits;
 }
@@ -29,27 +29,9 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function isValidCPF(cpf) {
-    const digits = cpf.replace(/\D/g, "");
-    if (digits.length !== 11) return false;
-    if (/^(\d)\1{10}$/.test(digits)) return false;
-
-    const calcCheckDigit = (base) => {
-        let sum = 0;
-        let weight = base.length + 1;
-        for (const digit of base) {
-            sum += parseInt(digit, 10) * weight;
-            weight -= 1;
-        }
-        const remainder = sum % 11;
-        return remainder < 2 ? 0 : 11 - remainder;
-    };
-
-    const base9 = digits.slice(0, 9);
-    const firstCheck = calcCheckDigit(base9);
-    const secondCheck = calcCheckDigit(base9 + String(firstCheck));
-
-    return digits === base9 + String(firstCheck) + String(secondCheck);
+function isValidPhone(phone) {
+    const digits = phone.replace(/\D/g, "");
+    return digits.length === 10 || digits.length === 11;
 }
 
 // --- Helpers de UI ---
@@ -77,20 +59,20 @@ document.getElementById("name").addEventListener("input", (event) => {
     event.target.value = maskName(event.target.value);
 });
 
-document.getElementById("cpf").addEventListener("input", (event) => {
-    event.target.value = maskCPF(event.target.value);
+document.getElementById("phone").addEventListener("input", (event) => {
+    event.target.value = maskPhone(event.target.value);
 });
 
 // --- Envio ---
 
 async function handleSubmit() {
     setFormStatus("");
-    ["name", "age", "email", "cpf", "terms"].forEach((field) => setFieldError(field, ""));
+    ["name", "age", "email", "phone", "terms"].forEach((field) => setFieldError(field, ""));
 
     const name = document.getElementById("name").value.trim();
     const age = document.getElementById("age").value;
     const email = document.getElementById("email").value.trim();
-    const cpf = document.getElementById("cpf").value;
+    const phone = document.getElementById("phone").value;
     const termsChecked = document.getElementById("terms").checked;
 
     let valid = true;
@@ -107,8 +89,8 @@ async function handleSubmit() {
         setFieldError("email", "E-mail inválido.");
         valid = false;
     }
-    if (!isValidCPF(cpf)) {
-        setFieldError("cpf", "CPF inválido.");
+    if (!isValidPhone(phone)) {
+        setFieldError("phone", "Telefone inválido.");
         valid = false;
     }
     if (!termsChecked) {
@@ -132,30 +114,31 @@ async function handleSubmit() {
         const emailHashBuffer = await _digestMessage(email);
         const emailHash = _arrayBufferToHexString(emailHashBuffer);
 
-        const cpfDigits = cpf.replace(/\D/g, "");
+        const phoneDigits = phone.replace(/\D/g, "");
 
         const encryptedName = await dbEncryptString(name, publicKeyPem);
         const encryptedEmail = await dbEncryptString(email, publicKeyPem);
-        const encryptedCpf = await dbEncryptString(cpfDigits, publicKeyPem);
+        const encryptedPhone = await dbEncryptString(phoneDigits, publicKeyPem);
 
-        const response = await fetch(`/users/${userId}`, {
-            method: "PUT",
+        const response = await fetch(`/pages/form/${userId}/complete`, {
+            method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 name: encryptedName,
                 email: encryptedEmail,
                 email_hash: emailHash,
-                cpf: encryptedCpf,
-                status: "form",
+                phone: encryptedPhone,
             }),
         });
 
+        const responseBody = await response.json().catch(() => ({}));
+
         if (!response.ok) {
-            const errorBody = await response.json().catch(() => ({}));
-            throw new Error(errorBody.error || "Erro ao enviar formulário.");
+            throw new Error(responseBody.error || "Erro ao enviar formulário.");
         }
 
         setFormStatus("Dados enviados com sucesso!");
+        window.location.href = responseBody.redirect || "/continue";
     } catch (error) {
         setFormStatus(error.message, true);
     }

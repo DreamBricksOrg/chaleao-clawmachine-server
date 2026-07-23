@@ -25,6 +25,11 @@ def create_totem_api_blueprint(user_service):
         user_id = data.get("id")
         result = data.get("result")
 
+        if not user_id:
+            return jsonify({"error": "id is required"}), 400
+        if not result:
+            return jsonify({"error": "result is required"}), 400
+
         try:
             user = user_service.register_match_result(user_id, result)
         except ValueError as error:
@@ -40,9 +45,5 @@ def create_totem_api_blueprint(user_service):
         if user is None:
             return jsonify({"status": "inactive"}), 200
         return jsonify({"status": user.status.value}), 200
-        
+
     return totem_bp
-
-    
-
-    

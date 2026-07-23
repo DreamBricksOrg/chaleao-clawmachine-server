@@ -245,6 +245,61 @@ OPENAPI_SPEC = {
                 },
             }
         },
+        "/pages/form/{user_id}/complete": {
+            "post": {
+                "tags": ["pages"],
+                "summary": "Conclui o cadastro do formulário (name, email, phone criptografados + email_hash)",
+                "description": (
+                    "Se o email_hash já pertencer a outro usuário, não sobrescreve o usuário "
+                    "atual: verifica o cooldown de 12h desse usuário existente e, se elegível, "
+                    "marca-o como play_again; caso contrário, direciona para play_error. "
+                    "Se for um email novo, atualiza o usuário atual (status vira form). "
+                    "Em qualquer sucesso, define o cookie 'user_id' e retorna a URL de redirecionamento."
+                ),
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "path",
+                        "required": True,
+                        "schema": {"type": "string"},
+                    }
+                ],
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {
+                            "schema": {"$ref": "#/components/schemas/CompleteFormRequest"}
+                        }
+                    },
+                },
+                "responses": {
+                    "200": {
+                        "description": "Redirecionamento a seguir (/continue ou /play_error)",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/RedirectResponse"}
+                            }
+                        },
+                    },
+                    "400": {
+                        "description": "Dados inválidos ou campos ausentes",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                            }
+                        },
+                    },
+                    "404": {
+                        "description": "Usuário não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+                            }
+                        },
+                    },
+                },
+            }
+        },
     },
     "components": {
         "schemas": {
@@ -259,12 +314,18 @@ OPENAPI_SPEC = {
                     "name": {"type": "string", "nullable": True},
                     "email": {"type": "string", "nullable": True},
                     "email_hash": {"type": "string", "nullable": True},
-                    "cpf": {"type": "string", "nullable": True},
+                    "phone": {"type": "string", "nullable": True},
                     "status": {"$ref": "#/components/schemas/UserStatus"},
                     "created_at": {"type": "string", "format": "date-time"},
                     "last_plays": {
                         "type": "array",
-                        "items": {"type": "string", "format": "date-time"},
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "played_at": {"type": "string", "format": "date-time"},
+                                "won": {"type": "boolean", "nullable": True},
+                            },
+                        },
                     },
                 },
             },
@@ -278,11 +339,11 @@ OPENAPI_SPEC = {
             },
             "CreateUserRequest": {
                 "type": "object",
-                "required": ["name", "email", "cpf"],
+                "required": ["name", "email", "phone"],
                 "properties": {
                     "name": {"type": "string"},
                     "email": {"type": "string"},
-                    "cpf": {"type": "string"},
+                    "phone": {"type": "string"},
                     "status": {"$ref": "#/components/schemas/UserStatus"},
                 },
             },
@@ -292,13 +353,27 @@ OPENAPI_SPEC = {
                     "name": {"type": "string"},
                     "email": {"type": "string"},
                     "email_hash": {"type": "string"},
-                    "cpf": {"type": "string"},
+                    "phone": {"type": "string"},
                     "status": {"$ref": "#/components/schemas/UserStatus"},
                 },
             },
             "ErrorResponse": {
                 "type": "object",
                 "properties": {"error": {"type": "string"}},
+            },
+            "CompleteFormRequest": {
+                "type": "object",
+                "required": ["name", "email", "email_hash", "phone"],
+                "properties": {
+                    "name": {"type": "string", "description": "Nome criptografado"},
+                    "email": {"type": "string", "description": "Email criptografado"},
+                    "email_hash": {"type": "string", "description": "SHA-256 do email em texto puro"},
+                    "phone": {"type": "string", "description": "Telefone criptografado"},
+                },
+            },
+            "RedirectResponse": {
+                "type": "object",
+                "properties": {"redirect": {"type": "string"}},
             },
             "QrIdResponse": {
                 "type": "object",

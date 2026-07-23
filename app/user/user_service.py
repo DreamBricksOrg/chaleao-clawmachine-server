@@ -5,8 +5,8 @@ class UserService:
     def __init__(self, repository):
         self.repository = repository
 
-    def create_user(self, name, email, cpf, status=UserStatus.ACTIVE):
-        user = User.create(name=name, email=email, cpf=cpf, status=status)
+    def create_user(self, name, email, phone, status=UserStatus.ACTIVE):
+        user = User.create(name=name, email=email, phone=phone, status=status)
         self.repository.add(user)
         return user
 
@@ -18,15 +18,18 @@ class UserService:
     def get_user(self, user_id):
         return self.repository.get_by_id(user_id)
 
+    def find_by_email_hash(self, email_hash):
+        return self.repository.find_by_email_hash(email_hash)
+
     def list_users(self):
         return self.repository.list_all()
 
-    def update_user(self, user_id, name=None, email=None, cpf=None, status=None, email_hash=None):
+    def update_user(self, user_id, name=None, email=None, phone=None, status=None, email_hash=None):
         user = self.repository.get_by_id(user_id)
         if user is None:
             return None
 
-        user.update(name=name, email=email, cpf=cpf, status=status, email_hash=email_hash)
+        user.update(name=name, email=email, phone=phone, status=status, email_hash=email_hash)
         self.repository.update(user)
         return user
 
@@ -36,5 +39,10 @@ class UserService:
             return None
 
         user.register_match_result(result)
+        self.repository.update(user)
+        return user
+
+    def mark_play_again(self, user):
+        user.mark_play_again()
         self.repository.update(user)
         return user

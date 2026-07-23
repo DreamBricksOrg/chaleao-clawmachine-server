@@ -36,7 +36,7 @@ function csvEscape(value) {
 }
 
 function usersToCsv(users) {
-    const header = ["id", "name", "email", "cpf", "status"];
+    const header = ["id", "name", "email", "phone", "status"];
     const lines = [header.join(",")];
     for (const user of users) {
         lines.push(header.map((field) => csvEscape(user[field])).join(","));
@@ -141,7 +141,7 @@ if (btnDownloadDecryptedCsv) {
                     id: user.id,
                     name: await decryptField(user.name),
                     email: await decryptField(user.email),
-                    cpf: await decryptField(user.cpf),
+                    phone: await decryptField(user.phone),
                     status: user.status,
                 });
             }

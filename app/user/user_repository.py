@@ -14,6 +14,14 @@ class UserRepository:
             return None
         return self._to_entity(document)
 
+    def find_by_email_hash(self, email_hash):
+        if not email_hash:
+            return None
+        document = self.collection.find_one({"email_hash": email_hash})
+        if document is None:
+            return None
+        return self._to_entity(document)
+
     def list_all(self):
         return [self._to_entity(document) for document in self.collection.find()]
 
@@ -29,7 +37,7 @@ class UserRepository:
             "name": user.name,
             "email": user.email,
             "email_hash": user.email_hash,
-            "cpf": user.cpf,
+            "phone": user.phone,
             "status": user.status.value,
             "created_at": user.created_at,
             "last_plays": user.last_plays,
@@ -44,7 +52,7 @@ class UserRepository:
             id=document["_id"],
             name=document["name"],
             email=document["email"],
-            cpf=document["cpf"],
+            phone=document.get("phone"),
             status=UserStatus(document["status"]),
             created_at=document.get("created_at"),
             last_plays=document.get("last_plays"),
