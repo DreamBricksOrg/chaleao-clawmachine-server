@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
 
+from app.log_sender import log
+
 
 def create_totem_api_blueprint(session_service):
     totem_bp = Blueprint("totem", __name__, url_prefix="/api")
@@ -12,11 +14,25 @@ def create_totem_api_blueprint(session_service):
 
     @totem_bp.get("/start/<session_id>")
     def start(session_id):
-        return jsonify({"status": session_service.start_status(session_id)}), 200
+        status = session_service.start_status(session_id)
+        if status == "active":
+            log(
+                "Usuário conectou na sessão",
+                tags=["totem", "start", "connected"],
+                data={"session_id": session_id},
+            )
+        return jsonify({"status": status}), 200
 
     @totem_bp.get("/play/<session_id>")
     def play(session_id):
-        return jsonify({"status": session_service.play_status(session_id)}), 200
+        status = session_service.play_status(session_id)
+        if status == "form":
+            log(
+                "Cadastro concluído; sessão pronta para jogar",
+                tags=["totem", "play", "form"],
+                data={"session_id": session_id},
+            )
+        return jsonify({"status": status}), 200
 
     @totem_bp.post("/matchresult")
     def match_result():
@@ -36,6 +52,12 @@ def create_totem_api_blueprint(session_service):
 
         if user is None:
             return jsonify({"error": "User not found"}), 404
+
+        log(
+            "Resultado da partida registrado",
+            tags=["totem", "matchresult", result],
+            data={"session_id": session_id, "result": result, "status": user.status.value},
+        )
         return jsonify(user.to_dict()), 200
 
     return totem_bp

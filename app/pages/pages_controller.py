@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 
+from app.log_sender import log
+
 COOKIE_NAME = "user_id"
 COOKIE_MAX_AGE = 60 * 60 * 24 * 365  # 1 ano
 
@@ -29,10 +31,21 @@ def create_pages_blueprint(session_service):
         action, user = session_service.enter_form(session_id, cookie_user_id)
 
         if action == "play":
+            log(
+                "Usuário cadastrado reincidente conectou",
+                tags=["form", "reincidencia"],
+                data={"session_id": session_id, "user_id": user.id},
+            )
             response = redirect(url_for("pages.continue_page"))
             _set_user_cookie(response, user.id)
             return response
         if action == "blocked":
+            log(
+                "Usuário cadastrado bloqueado (cooldown)",
+                level="WARNING",
+                tags=["form", "block"],
+                data={"session_id": session_id, "user_id": user.id},
+            )
             return redirect(url_for("pages.play_error_page"))
         return render_template("form.html", user_id=session_id)
 
@@ -57,6 +70,17 @@ def create_pages_blueprint(session_service):
         if action == "blocked":
             return jsonify({"redirect": url_for("pages.play_error_page")}), 200
 
+        log(
+            "Cadastro concluído",
+            tags=["form", "complete"],
+            data={
+                "session_id": session_id,
+                "name": name,
+                "email": email,
+                "email_hash": email_hash,
+                "phone": phone,
+            },
+        )
         response = jsonify({"redirect": url_for("pages.continue_page")})
         _set_user_cookie(response, user.id)
         return response, 200
