@@ -31,6 +31,9 @@ class UserRepository:
             {"$set": self._to_document(user, include_id=False)},
         )
 
+    def delete(self, user_id):
+        self.collection.delete_one({"_id": user_id})
+
     @staticmethod
     def _to_document(user, include_id=True):
         document = {

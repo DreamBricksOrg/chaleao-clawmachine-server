@@ -135,11 +135,16 @@ OPENAPI_SPEC = {
         },
         "/api/qrid": {
             "get": {
-                "tags": ["qr"],
-                "summary": "Gera um id e a url do formulário associado",
+                "tags": ["totem"],
+                "summary": "Abre uma sessão de totem e retorna o id da sessão + url do formulário",
+                "description": (
+                    "O id retornado é um id de sessão do totem (não um usuário). O totem "
+                    "usa esse mesmo id em /start, /play e /matchresult; o servidor resolve "
+                    "qual usuário está por trás quando o celular conecta."
+                ),
                 "responses": {
                     "200": {
-                        "description": "Id e url gerados",
+                        "description": "Id da sessão e url gerados",
                         "content": {
                             "application/json": {
                                 "schema": {"$ref": "#/components/schemas/QrIdResponse"}
@@ -149,21 +154,22 @@ OPENAPI_SPEC = {
                 },
             }
         },
-        "/api/start/{user_id}": {
+        "/api/start/{session_id}": {
             "get": {
-                "tags": ["qr"],
-                "summary": "Consulta o status de um usuário pelo id",
+                "tags": ["totem"],
+                "summary": "Polling do totem: 'active' quando algum usuário conecta à sessão",
                 "parameters": [
                     {
-                        "name": "user_id",
+                        "name": "session_id",
                         "in": "path",
                         "required": True,
                         "schema": {"type": "string"},
+                        "description": "Id da sessão (o mesmo uuid do QR)",
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Status do usuário (ou 'inactive' se não encontrado)",
+                        "description": "'active' se há usuário vinculado, senão 'inactive'",
                         "content": {
                             "application/json": {
                                 "schema": {"$ref": "#/components/schemas/StatusResponse"}
@@ -173,42 +179,38 @@ OPENAPI_SPEC = {
                 },
             }
         },
-        "/api/play/{user_id}": {
+        "/api/play/{session_id}": {
             "get": {
-                "tags": ["qr"],
-                "summary": "Consulta o status de um usuário pelo id (404 se não encontrado)",
+                "tags": ["totem"],
+                "summary": "Polling do totem: 'form' quando a sessão está pronta para jogar",
                 "parameters": [
                     {
-                        "name": "user_id",
+                        "name": "session_id",
                         "in": "path",
                         "required": True,
                         "schema": {"type": "string"},
+                        "description": "Id da sessão (o mesmo uuid do QR)",
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Status do usuário",
+                        "description": (
+                            "'form' quando pronto para jogar (cadastro concluído ou "
+                            "retornante elegível); senão o status atual ou 'inactive'"
+                        ),
                         "content": {
                             "application/json": {
                                 "schema": {"$ref": "#/components/schemas/StatusResponse"}
                             }
                         },
-                    },
-                    "404": {
-                        "description": "Usuário não encontrado",
-                        "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
-                            }
-                        },
-                    },
+                    }
                 },
             }
         },
         "/api/matchresult": {
             "post": {
                 "tags": ["totem"],
-                "summary": "Registra o resultado de uma partida para um usuário",
+                "summary": "Registra o resultado da partida (id = id da sessão do totem)",
                 "requestBody": {
                     "required": True,
                     "content": {
@@ -333,7 +335,7 @@ OPENAPI_SPEC = {
                 "type": "object",
                 "required": ["id", "result"],
                 "properties": {
-                    "id": {"type": "string"},
+                    "id": {"type": "string", "description": "Id da sessão do totem (uuid do QR)"},
                     "result": {"type": "string", "enum": ["win", "lose"]},
                 },
             },

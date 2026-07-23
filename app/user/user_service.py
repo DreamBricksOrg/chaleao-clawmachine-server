@@ -46,3 +46,8 @@ class UserService:
         user.mark_play_again()
         self.repository.update(user)
         return user
+
+    def delete_blank_user(self, user_id):
+        user = self.repository.get_by_id(user_id)
+        if user is not None and user.name is None and user.email is None:
+            self.repository.delete(user_id)
