@@ -20,11 +20,6 @@ function maskPhone(value) {
 
 // --- Validação ---
 
-function isAdult(age) {
-    const value = parseInt(age, 10);
-    return Number.isInteger(value) && value >= 18;
-}
-
 function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -67,10 +62,9 @@ document.getElementById("phone").addEventListener("input", (event) => {
 
 async function handleSubmit() {
     setFormStatus("");
-    ["name", "age", "email", "phone", "terms"].forEach((field) => setFieldError(field, ""));
+    ["name", "email", "phone", "terms"].forEach((field) => setFieldError(field, ""));
 
     const name = document.getElementById("name").value.trim();
-    const age = document.getElementById("age").value;
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value;
     const termsChecked = document.getElementById("terms").checked;
@@ -79,10 +73,6 @@ async function handleSubmit() {
 
     if (!name) {
         setFieldError("name", "Informe seu nome.");
-        valid = false;
-    }
-    if (!isAdult(age)) {
-        setFieldError("age", "Você deve ter 18 anos ou mais.");
         valid = false;
     }
     if (!isValidEmail(email)) {

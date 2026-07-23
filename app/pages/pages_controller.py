@@ -40,7 +40,7 @@ def create_pages_blueprint(user_service):
             user_service.create_blank_user(user_id, status=UserStatus.ACTIVE)
         return render_template("form.html", user_id=user_id)
 
-    @pages_bp.post("/pages/form/<user_id>/complete")
+    @pages_bp.post("/form/<user_id>/complete")
     def complete_form(user_id):
         data = request.get_json(silent=True) or {}
         name = data.get("name")
